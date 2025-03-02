@@ -11,15 +11,15 @@ const fragmentShader = `
     #ifdef GL_ES
     precision mediump float;
     #endif
-
+    
     uniform float u_time;
-
-    vec4 purple() {
-     return vec4(0.1, 0.0, 1.0, 1.0);
-    } 
     
     void main() {
-      gl_FragColor = purple();
+    float r = abs(sin(u_time * 0.1));  
+    float g = fract(u_time * 0.1);
+    float b = mod(u_time, 2.0) / 2.0;
+
+    gl_FragColor = vec4(r, g, b, 1.0);
     }
 `
 
