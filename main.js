@@ -1,37 +1,45 @@
-import THREE from "three"
+import * as THREE from 'three';
 
-const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10)
-camera.position.z = 1;
-
+const scene = new THREE.Scene()
+const camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000)
 const renderer = new THREE.WebGLRenderer()
+
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
-const geometry = new THREE.PlaneGeometry(2, 2)
-const material = new THREE.ShaderMaterial({
-  uniforms: {
-    u_time: { value: 0.0 },
-  },
-  fragmentShader: `
-  precision mediup float;
-  uniform float u_time; 
-  #ifdef GL_ES
-  precision mediump float;
-  #endif
-  uniform float u_time;
-  void main() {
-	gl_FragColor = vec4(1.0,0.0,1.0,1.0);
-  `,
-});
+const fragmentShader = `
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
 
-const mesh = new THREE.Mesh(geometry, material)
+    uniform float u_time;
+
+    vec4 purple() {
+     return vec4(0.1, 0.0, 1.0, 1.0);
+    } 
+    
+    void main() {
+      gl_FragColor = purple();
+    }
+`
+
+const shaderMaterial = new THREE.ShaderMaterial({
+    fragmentShader,
+    uniforms: {
+        u_time: { value: 0.0 }
+    }
+})
+
+const geometry = new THREE.PlaneGeometry(2, 2)
+const mesh = new THREE.Mesh(geometry, shaderMaterial)
 scene.add(mesh)
 
-const animate = (time) => {
-  material.uniforms.u_time.value = time * 0.001
-  renderer.render(scene, camera)
-  requestAnimationFrame(animate)
-};
+camera.position.z = 1
 
-animate(0)
+const animate = () => {
+    requestAnimationFrame(animate)
+    shaderMaterial.uniforms.u_time.value = performance.now() / 1000.0
+    renderer.render(scene, camera)
+}
+
+animate()
